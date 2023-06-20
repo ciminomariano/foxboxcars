@@ -8,7 +8,7 @@
     </div>
   </div>
 
-  <table class="table">
+  <table class="table" id="carTable">
     <thead>
       <tr>
         <th>Brand</th>
@@ -23,13 +23,13 @@
     <tbody>
       {% for car in car_list %}
         <tr>
-          <td contenteditable="false">{{ car.brand }}</td>
-          <td contenteditable="false">{{ car.model }}</td>
-          <td contenteditable="false">{{ car.main_color }}</td>
-          <td contenteditable="false">{{ car.value }}</td>
-          <td contenteditable="false">{{ car.production_costs }}</td>
-          <td contenteditable="false">{{ car.transportation_costs }}</td>
-          <td contenteditable="false">{{ car.total }}</td>
+          <td>{{ car.brand }}</td>
+          <td>{{ car.model }}</td>
+          <td>{{ car.main_color }}</td>
+          <td>{{ car.value }}</td>
+          <td class="editable-cell" oninput="updateTotal(this)">{{ car.production_costs }}</td>
+          <td class="editable-cell" oninput="updateTotal(this)">{{ car.transportation_costs }}</td>
+          <td>{{ car.total }}</td>
         </tr>
       {% empty %}
         <tr>
@@ -40,25 +40,31 @@
   </table>
 
   <div class="mb-3">
-    <a href="javascript:void(0)" onclick="startUpdating()" class="btn btn-primary" id="startUpdatingBtn">Start Updating</a>
+    <a href="javascript:void(0)" onclick="startUpdating()" class="btn btn-secondary" id="startUpdatingBtn">Start Updating</a>
   </div>
 
   <div class="mb-3 d-none" id="updateButtons">
     <div class="d-flex justify-content-between">
       <div>
-        <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+        <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
       </div>
       <div>
-        <a href="{% url 'car_list' %}" class="btn btn-secondary">Cancel</a>
+        <a href="{% url 'car_list' %}" class="btn btn-primary">Cancel</a>
       </div>
     </div>
   </div>
 
   <script>
     function startUpdating() {
-      var cells = document.querySelectorAll('td[contenteditable="false"]');
-      for (var i = 0; i < cells.length; i++) {
-        cells[i].setAttribute('contenteditable', 'true');
+      var table = document.getElementById('carTable');
+      var rows = table.getElementsByTagName('tr');
+
+      for (var i = 1; i < rows.length; i++) {
+        var cells = rows[i].getElementsByTagName('td');
+        for (var j = 0; j < cells.length - 1; j++) {  // -1 to exclude the last cell (Total)
+          cells[j].contentEditable = true;
+          cells[j].classList.add('editable-cell');
+        }
       }
 
       var startUpdatingBtn = document.getElementById('startUpdatingBtn');
@@ -66,6 +72,34 @@
 
       var updateButtons = document.getElementById('updateButtons');
       updateButtons.classList.remove('d-none');
+
+      var firstEditableCell = table.querySelector('.editable-cell');
+      if (firstEditableCell) {
+        firstEditableCell.focus();
+      }
+    }
+
+    function updateTotal(cell) {
+      var row = cell.parentNode;
+      var productionCosts = parseFloat(row.children[4].innerText);
+      var transportationCosts = parseFloat(row.children[5].innerText);
+      var total = productionCosts + transportationCosts;
+
+      row.children[6].innerText = total.toFixed(2);
     }
   </script>
+
+  <style>
+    .editable-cell {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      padding: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .editable-cell:focus {
+      background-color: #e0e0e0;
+      outline: none;
+    }
+  </style>
 {% endblock %}
