@@ -40,35 +40,35 @@
   </table>
 
   <div class="mb-3">
-    <a href="javascript:void(0)" onclick="startUpdating()" class="btn btn-secondary" id="startUpdatingBtn">Start Updating</a>
+    <a href="javascript:void(0)" onclick="startEditing()" class="btn btn-secondary" id="startEditingBtn">Start Editing</a>
   </div>
 
   <div class="mb-3 d-none" id="updateButtons">
     <div class="d-flex justify-content-between">
       <div>
-        <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+        <button type="button" class="btn btn-primary" onclick="saveChanges()">Save</button>
       </div>
       <div>
-        <a href="{% url 'car_list' %}" class="btn btn-primary">Cancel</a>
+        <a href="javascript:void(0)" onclick="location.reload()" class="btn btn-primary">Cancel</a>
       </div>
     </div>
   </div>
 
   <script>
-    function startUpdating() {
+    function startEditing() {
       var table = document.getElementById('carTable');
       var rows = table.getElementsByTagName('tr');
 
       for (var i = 1; i < rows.length; i++) {
         var cells = rows[i].getElementsByTagName('td');
         for (var j = 0; j < cells.length - 1; j++) {  // -1 to exclude the last cell (Total)
-          cells[j].contentEditable = true;
+          cells[j].setAttribute('contenteditable', 'true');
           cells[j].classList.add('editable-cell');
         }
       }
 
-      var startUpdatingBtn = document.getElementById('startUpdatingBtn');
-      startUpdatingBtn.classList.add('d-none');
+      var startEditingBtn = document.getElementById('startEditingBtn');
+      startEditingBtn.classList.add('d-none');
 
       var updateButtons = document.getElementById('updateButtons');
       updateButtons.classList.remove('d-none');
@@ -86,6 +86,25 @@
       var total = productionCosts + transportationCosts;
 
       row.children[6].innerText = total.toFixed(2);
+    }
+
+    function saveChanges() {
+      var table = document.getElementById('carTable');
+      var rows = table.getElementsByTagName('tr');
+
+      for (var i = 1; i < rows.length; i++) {
+        var cells = rows[i].getElementsByTagName('td');
+        for (var j = 0; j < cells.length - 1; j++) {  // -1 to exclude the last cell (Total)
+          cells[j].removeAttribute('contenteditable');
+          cells[j].classList.remove('editable-cell');
+        }
+      }
+
+      var startEditingBtn = document.getElementById('startEditingBtn');
+      startEditingBtn.classList.remove('d-none');
+
+      var updateButtons = document.getElementById('updateButtons');
+      updateButtons.classList.add('d-none');
     }
   </script>
 
