@@ -1,46 +1,60 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Add Car</h1>
+  <h1 class="text-center">Add Car</h1>
   <form method="post">
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
-    <div class="mb-3">
+    <div class="mb-3 text-center">
       <label for="{{ form.id_model.id_for_label }}" class="form-label">Model</label>
-      {{ form.model }}
+      <div>
+        {{ form.model }}
+      </div>
     </div>
-    <div class="mb-3">
+    <div class="mb-3 text-center">
       <label for="{{ form.id_brand.id_for_label }}" class="form-label">Brand</label>
-      {{ form.brand }}
+      <div>
+        {{ form.brand }}
+      </div>
     </div>
-    <div class="mb-3">
+    <div class="mb-3 text-center">
       <label for="{{ form.id_main_color.id_for_label }}" class="form-label">Main Color</label>
-      {{ form.main_color }}
+      <div>
+        {{ form.main_color }}
+      </div>
     </div>
-    <div class="mb-3">
+    <div class="mb-3 text-center">
       <label for="{{ form.id_value.id_for_label }}" class="form-label">Value</label>
-      {{ form.value }}
+      <div>
+        {{ form.value }}
+      </div>
       {% for error in form.value.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
-    <div class="mb-3">
+    <div class="mb-3 text-center">
       <label for="{{ form.id_production_costs.id_for_label }}" class="form-label">Production Costs</label>
-      {{ form.production_costs }}
+      <div>
+        {{ form.production_costs }}
+      </div>
       {% for error in form.production_costs.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
-    <div class="mb-3">
+    <div class="mb-3 text-center">
       <label for="{{ form.id_transportation_costs.id_for_label }}" class="form-label">Transportation Costs</label>
-      {{ form.transportation_costs }}
+      <div>
+        {{ form.transportation_costs }}
+      </div>
       {% for error in form.transportation_costs.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
     {% endfor %}
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a href="{% url 'car_list' %}" class="btn btn-secondary">Cancel</a>
+    <div class="d-flex justify-content-center">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-secondary ms-2" onclick="window.location.reload()">Cancel</button>
+    </div>
   </form>
 {% endblock %}

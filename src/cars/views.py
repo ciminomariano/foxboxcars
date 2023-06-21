@@ -8,8 +8,8 @@ from .models import Car
 
 class CarCreateView(ListView):
     model = Car
-    template_name = 'cars/car_create.html'  # Ruta a tu plantilla
-    context_object_name = 'car_list'  # Nombre del objeto de contexto en la plantilla
+    template_name = 'cars/car_create.html'
+    context_object_name = 'car_list'
 
     def get(self, request, *args, **kwargs):
         CarFormSet = formset_factory(CarForm, extra=1)
@@ -28,8 +28,8 @@ class CarCreateView(ListView):
 
 class CarListView(ListView):
     model = Car
-    template_name = 'cars/car_list.html'  # Ruta a tu plantilla
-    context_object_name = 'car_list'  # Nombre del objeto de contexto en la plantilla
+    template_name = 'cars/car_list.html'
+    context_object_name = 'car_list'
 
 
 class CarUpdateView(FormView):
