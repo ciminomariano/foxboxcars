@@ -8,5 +8,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', CarListView.as_view(), name='car_list'),
     path('car/create/', CarCreateView.as_view(), name='car_create'),
-    path('car/update/<int:pk>/', CarUpdateView.as_view(), name='car_update'),
+    path('car/update/', CarUpdateView.as_view(), name='car_update'),
 ]

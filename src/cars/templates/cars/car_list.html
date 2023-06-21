@@ -8,76 +8,77 @@
     </div>
   </div>
 
-  <table class="table" id="carTable">
-    <thead>
-      <tr>
-        <th>Brand</th>
-        <th>Model</th>
-        <th>Main Color</th>
-        <th>Value</th>
-        <th>Production Costs</th>
-        <th>Transportation Costs</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for car in car_list %}
+  <form id="carForm" method="POST" action="{% url 'car_update' %}">
+    {% csrf_token %}
+    <table class="table" id="carTable">
+      <thead>
         <tr>
-          <td>{{ car.brand }}</td>
-          <td>{{ car.model }}</td>
-          <td>{{ car.main_color }}</td>
-          <td>{{ car.value }}</td>
-          <td class="editable-cell" oninput="updateTotal(this)">{{ car.production_costs }}</td>
-          <td class="editable-cell" oninput="updateTotal(this)">{{ car.transportation_costs }}</td>
-          <td>{{ car.total }}</td>
+          <th>Brand</th>
+          <th>Model</th>
+          <th>Main Color</th>
+          <th>Value</th>
+          <th>Production Costs</th>
+          <th>Transportation Costs</th>
+          <th>Total</th>
         </tr>
-      {% empty %}
-        <tr>
-          <td colspan="7">No cars found.</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for car in car_list %}
+          <tr>
+            <td>{{ car.brand }}</td>
+            <td>{{ car.model }}</td>
+            <td>{{ car.main_color }}</td>
+            <td>{{ car.value }}</td>
+            <td class="editable-cell" oninput="updateTotal(this)" contenteditable="false">{{ car.production_costs }}</td>
+            <td class="editable-cell" oninput="updateTotal(this)" contenteditable="false">{{ car.transportation_costs }}</td>
+            <td>{{ car.total }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7">No cars found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <div class="mb-3">
-    <a href="javascript:void(0)" onclick="startEditing()" class="btn btn-secondary" id="startEditingBtn">Start Editing</a>
-  </div>
+    <div class="mb-3">
+    <a href="{% url 'car_update' %}" class="btn btn-secondary">Start Editing</a>
+    </div>
 
-  <div class="mb-3 d-none" id="updateButtons">
-    <div class="d-flex justify-content-between">
-      <div>
-        <button type="button" class="btn btn-primary" onclick="saveChanges()">Save</button>
-      </div>
-      <div>
-        <a href="javascript:void(0)" onclick="location.reload()" class="btn btn-primary">Cancel</a>
+
+    <div class="mb-3 d-none" id="updateButtons">
+      <div class="d-flex justify-content-between">
+        <div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary" onclick="cancelEditing()">Cancel</button>
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 
   <script>
-    function startEditing() {
+    document.getElementById('startEditingBtn').addEventListener('click', function() {
       var table = document.getElementById('carTable');
       var rows = table.getElementsByTagName('tr');
 
       for (var i = 1; i < rows.length; i++) {
         var cells = rows[i].getElementsByTagName('td');
-        for (var j = 0; j < cells.length - 1; j++) {  // -1 to exclude the last cell (Total)
+        for (var j = 0; j < cells.length - 1; j++) {
           cells[j].setAttribute('contenteditable', 'true');
           cells[j].classList.add('editable-cell');
         }
       }
 
-      var startEditingBtn = document.getElementById('startEditingBtn');
-      startEditingBtn.classList.add('d-none');
-
-      var updateButtons = document.getElementById('updateButtons');
-      updateButtons.classList.remove('d-none');
+      document.getElementById('startEditingBtn').classList.add('d-none');
+      document.getElementById('updateButtons').classList.remove('d-none');
 
       var firstEditableCell = table.querySelector('.editable-cell');
       if (firstEditableCell) {
         firstEditableCell.focus();
       }
-    }
+    });
 
     function updateTotal(cell) {
       var row = cell.parentNode;
@@ -88,23 +89,8 @@
       row.children[6].innerText = total.toFixed(2);
     }
 
-    function saveChanges() {
-      var table = document.getElementById('carTable');
-      var rows = table.getElementsByTagName('tr');
-
-      for (var i = 1; i < rows.length; i++) {
-        var cells = rows[i].getElementsByTagName('td');
-        for (var j = 0; j < cells.length - 1; j++) {  // -1 to exclude the last cell (Total)
-          cells[j].removeAttribute('contenteditable');
-          cells[j].classList.remove('editable-cell');
-        }
-      }
-
-      var startEditingBtn = document.getElementById('startEditingBtn');
-      startEditingBtn.classList.remove('d-none');
-
-      var updateButtons = document.getElementById('updateButtons');
-      updateButtons.classList.add('d-none');
+    function cancelEditing() {
+      location.reload();
     }
   </script>
 

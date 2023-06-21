@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Update Cars</h1>
-  <form method="post" action="{% url 'cars:car_update' car.id %}">
+  <h1 class="text-center">Update Cars</h1>
+  <form method="post">
     {% csrf_token %}
-    <table class="table">
+    {{ formset.management_form }}
+    <table class="table" id="carTable">
       <thead>
         <tr>
-          <th>Brand</th>
           <th>Model</th>
+          <th>Brand</th>
           <th>Main Color</th>
           <th>Value</th>
           <th>Production Costs</th>
@@ -17,20 +18,61 @@
         </tr>
       </thead>
       <tbody>
-        {% for car in car_list %}
-          <tr>
-            <td>{{ car.brand }}</td>
-            <td>{{ car.model }}</td>
-            <td>{{ car.main_color }}</td>
-            <td>{{ car.value }}</td>
-            <td><input type="number" name="production_costs_{{ car.id }}" value="{{ car.production_costs }}"></td>
-            <td><input type="number" name="transportation_costs_{{ car.id }}" value="{{ car.transportation_costs }}"></td>
-            <td>{{ car.total }}</td>
-          </tr>
+        {% for form in formset %}
+        <tr>
+          <td>{{ form.model }}</td>
+          <td>{{ form.brand }}</td>
+          <td>{{ form.main_color }}</td>
+          <td class="editable-cell">
+            <input type="number" step="0.01" name="{{ form.prefix }}-value" value="{{ form.value.value }}" style="width: 80px;">
+          </td>
+          <td class="editable-cell">
+            <input type="number" step="0.01" name="{{ form.prefix }}-production_costs" value="{{ form.production_costs.value }}" style="width: 80px;">
+          </td>
+          <td class="editable-cell">
+            <input type="number" step="0.01" name="{{ form.prefix }}-transportation_costs" value="{{ form.transportation_costs.value }}" style="width: 80px;">
+          </td>
+          <td class="total"></td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a href="{% url 'cars:car_list' %}" class="btn btn-secondary">Cancel</a>
+    <div class="d-flex justify-content-center">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{% url 'car_list' %}" class="btn btn-secondary ms-2">Cancel</a>
+    </div>
   </form>
+
+  <script>
+    var editableCells = document.querySelectorAll('.editable-cell');
+
+    editableCells.forEach(function(cell) {
+      cell.addEventListener('input', updateTotal);
+      updateTotal.call(cell); // Calcular el total al cargar la página
+    });
+
+    function updateTotal() {
+      var row = this.parentNode;
+      var value = parseFloat(row.querySelector('.editable-cell:nth-child(4) input').value) || 0;
+      var productionCosts = parseFloat(row.querySelector('.editable-cell:nth-child(5) input').value) || 0;
+      var transportationCosts = parseFloat(row.querySelector('.editable-cell:nth-child(6) input').value) || 0;
+      var total = productionCosts + transportationCosts;
+
+      row.querySelector('.total').innerText = total.toFixed(2);
+    }
+  </script>
+
+  <style>
+    .editable-cell {
+      position: relative;
+      padding: 0;
+    }
+
+    .editable-cell input {
+      padding: 5px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      width: 80px;
+    }
+  </style>
 {% endblock %}

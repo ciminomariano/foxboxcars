@@ -1,23 +1,34 @@
-from django.views.generic import ListView
-from django.views.generic.edit import FormView
+from django.views.generic import ListView, FormView
+from django.views.generic.edit import CreateView
 from django.shortcuts import render, redirect
-from django.forms import formset_factory
+from django.forms import formset_factory, modelformset_factory
 from .forms import CarForm
 from .models import Car
 
 
-class CarCreateView(ListView):
+class CarCreateView(CreateView):
     model = Car
     template_name = 'cars/car_create.html'
-    context_object_name = 'car_list'
+    form_class = CarForm
 
-    def get(self, request, *args, **kwargs):
-        CarFormSet = formset_factory(CarForm, extra=1)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        CarFormSet = formset_factory(self.form_class, extra=1)
         formset = CarFormSet()
-        return render(request, self.template_name, {'formset': formset})
+        context['formset'] = formset
+        return context
+
+    def form_valid(self, form):
+        CarFormSet = formset_factory(self.form_class, extra=1)
+        formset = CarFormSet(self.request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+            return redirect('car_list')
+        return render(self.request, self.template_name, {'formset': formset})
 
     def post(self, request, *args, **kwargs):
-        CarFormSet = formset_factory(CarForm, extra=1)
+        CarFormSet = formset_factory(self.form_class, extra=1)
         formset = CarFormSet(request.POST)
         if formset.is_valid():
             for form in formset:
@@ -31,22 +42,61 @@ class CarListView(ListView):
     template_name = 'cars/car_list.html'
     context_object_name = 'car_list'
 
-
 class CarUpdateView(FormView):
     template_name = 'cars/car_update.html'
     form_class = CarForm
-    success_url = '/'
+    success_url = '/car_list/'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['car_list'] = Car.objects.all()
+        car_list = Car.objects.all()
+        CarFormSet = formset_factory(self.form_class, extra=0)
+        formset = CarFormSet(initial=[{'brand': car.brand, 'model': car.model, 'main_color': car.main_color, 'value': car.value, 'production_costs': car.production_costs, 'transportation_costs': car.transportation_costs} for car in car_list])
+        context['formset'] = formset
         return context
 
     def form_valid(self, form):
-        for car in form.cleaned_data:
-            car_instance = Car.objects.get(id=car.id)
-            car_instance.production_costs = car.production_costs
-            car_instance.transportation_costs = car.transportation_costs
-            car_instance.total = car.production_costs + car.transportation_costs
-            car_instance.save()
-        return super().form_valid(form)
+        formset = form.cleaned_data['formset']
+        if formset.is_valid():
+            for form in formset:
+                car = form.save(commit=False)
+                # Realizar cualquier validación adicional o manipulación de datos aquí si es necesario
+                car.save()
+            return super().form_valid(form)
+        return render(self.request, self.template_name, {'formset': formset})
+
+    def post(self, request, *args, **kwargs):
+        CarFormSet = formset_factory(self.form_class, extra=1)
+        formset = CarFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+            return redirect('car_list')
+        return render(request, self.template_name, {'formset': formset})
+#
+# class CarUpdateView(FormView):
+#     template_name = 'cars/car_update.html'
+#     form_class = modelformset_factory(Car, form=CarForm, extra=0)
+#     success_url = '/car_list/'
+#
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         cars = Car.objects.all()
+#         context['car_list'] = cars
+#         return context
+#
+#     def form_valid(self, form):
+#         formset = form.cleaned_data['formset']
+#         if formset.is_valid():
+#             formset.save()
+#             return super().form_valid(form)
+#         return render(self.request, self.template_name, {'formset': formset})
+#
+#     def post(self, request, *args, **kwargs):
+#         form = self.get_form()
+#         formset = form.save(commit=False)
+#         if formset.is_valid():
+#             formset.save()
+#             return self.form_valid(form)
+#         else:
+#             return self.form_invalid(form)
