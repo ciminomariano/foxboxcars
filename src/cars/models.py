@@ -3,26 +3,26 @@ from django.db import models
 
 class Car(models.Model):
     COLOR_CHOICES = (
-        ('black', 'Negro'),
-        ('white', 'Blanco'),
-        ('silver', 'Plata'),
-        ('gray', 'Gris'),
-        ('red', 'Rojo'),
-        ('blue', 'Azul'),
-        ('green', 'Verde'),
-        ('yellow', 'Amarillo'),
-        ('orange', 'Naranja'),
-        ('brown', 'Marrón'),
-        ('purple', 'Morado'),
-        ('pink', 'Rosado'),
-        ('gold', 'Dorado'),
+        ('black', 'Black'),
+        ('white', 'White'),
+        ('silver', 'Silver'),
+        ('gray', 'Gray'),
+        ('red', 'Red'),
+        ('blue', 'Blue'),
+        ('green', 'Green'),
+        ('yellow', 'Yellow'),
+        ('orange', 'Orange'),
+        ('brown', 'Brown'),
+        ('purple', 'Purple'),
+        ('pink', 'Pink'),
+        ('gold', 'Gold'),
         ('beige', 'Beige'),
-        ('teal', 'Turquesa'),
-        ('navy', 'Azul Marino'),
-        ('burgundy', 'Burdeos'),
-        ('champagne', 'Champán'),
-        ('olive', 'Oliva'),
-        ('cream', 'Crema'),
+        ('teal', 'Teal'),
+        ('navy', 'Navy'),
+        ('burgundy', 'Burgundy'),
+        ('champagne', 'Champagne'),
+        ('olive', 'Olive'),
+        ('cream', 'Cream'),
     )
 
     BRAND_CHOICES = (
@@ -48,6 +48,7 @@ class Car(models.Model):
         ('cadillac', 'Cadillac'),
     )
 
+    id = models.AutoField(primary_key=True)
     main_color = models.CharField(max_length=50,choices=COLOR_CHOICES)
     model = models.CharField(max_length=100)
     brand = models.CharField(max_length=50, choices=BRAND_CHOICES)
@@ -60,4 +61,4 @@ class Car(models.Model):
         return self.production_costs + self.transportation_costs
 
     def __str__(self):
-        return f'{self.brand} {self.model}'
+        return f'{self.id} {self.brand} {self.model}'
