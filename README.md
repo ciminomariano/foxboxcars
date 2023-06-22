@@ -1,6 +1,5 @@
 # Foxbox Digital - Python Engineer Challenge
 
-This project is a web application for managing cars, developed using Django as the back-end framework.
 
 ## Technical Requirements
 
@@ -11,11 +10,11 @@ This project is a web application for managing cars, developed using Django as t
 - Class-Based Views
 - Form and Formset
 - Pytest for testing
-- Docker settings (optional)
+
 
 ## Project Description
 
-The main goal of this challenge is to assess your skills in developing back-end and front-end features.
+This project is a web application for managing cars, developed using Django as the back-end framework.
 
 ### Management Panel
 
@@ -60,8 +59,6 @@ python manage.py migrate
 To run the project, use the following command:
 python manage.py runserver
 
-arduino
-Copy code
 
 The project will be available at `http://localhost:8000/`.
 
