@@ -2,6 +2,7 @@ from django.views.generic import ListView, FormView
 from django.views.generic.edit import CreateView
 from django.shortcuts import render, redirect
 from django.forms import formset_factory, modelformset_factory
+from django.db import IntegrityError
 from .forms import CarForm
 from .models import Car
 
@@ -69,11 +70,35 @@ class CarUpdateView(FormView):
         return render(self.request, self.template_name, {'formset': formset})
 
     def post(self, request, *args, **kwargs):
-        Car.objects.all().delete()
+
+
         CarFormSet = formset_factory(self.form_class, extra=1)
         formset = CarFormSet(request.POST)
+
         if formset.is_valid():
+            try:
+                Car.objects.all().delete()
+            except Exception as e:
+                error_message = "Error occurred while deleting cars: " + str(e)
+                return render(request, self.template_name, {'error_message': error_message})
+
+            instances = []
+
             for form in formset:
-                form.save()
-            return redirect('car_list')
+                instance = form.save(commit=False)
+                instances.append(instance)
+
+            try:
+                Car.objects.bulk_create(instances)
+                return redirect('car_list')
+
+            except IntegrityError as e:
+                error_message = "Error occurred while saving cars: " + str(e)
+                return render(request, self.template_name, {'formset': formset, 'error_message': error_message})
+
+            except Exception as e:
+                error_message = "Error occurred while saving cars: " + str(e)
+                return render(request, self.template_name, {'formset': formset, 'error_message': error_message})
+
         return render(request, self.template_name, {'formset': formset})
+
